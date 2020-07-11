@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放大镜</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+        }
+        html,body{
+            width:100%;
+            height:100vh;
+        }
+
+        .wrapper{
+          
+            height:600px;
+            display: flex;
+            margin-left: 100px;
+            flex-flow: row nowrap;
+        }
+        .wrap{
+            width:600px;
+            height:600px;
+            display: flex;
+            flex-flow: column nowrap;
+            margin-top: 50px;
+        }
+        
+        .content{
+            width:600px;
+            height:520px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .nav{
+            width:600px;
+            height:80px;
+        }
+        .nav li{
+            list-style: none;
+            float: left;
+        }
+        .nav li img{
+            width:110px;
+            height:100px;
+            margin: 5px;
+        }
+        .left_img{
+            width:600px;
+            height:520px;
+            display: none;
+        }
+        .right_img{
+            margin-left: 10px;
+            width:600px;
+            height:510px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 50px;
+        }
+        .imgs{
+            width:200%;
+            height:200%;
+            position: absolute;
+        }
+        .left_img.current{
+            display: block;
+        }
+        .scaleEle{
+            /*display: none;*/
+            position: absolute;
+            width:200px;
+            height:180px;
+            background: red;
+            cursor: pointer;
+            opacity: .3;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="wrap">
+            <div class="content">
+                <img class="left_img current" src="./img/01.jpg" alt="" />
+                <img class="left_img" src="./img/02.jpg" alt="" />
+                <img class="left_img" src="./img/03.jpg" alt="" />
+                <img class="left_img" src="./img/04.jpg" alt="" />
+                <img class="left_img" src="./img/05.jpg" alt="" />
+                <!-- 放大镜 -->
+                <div class="scaleEle"></div>
+            </div>
+            <ul class="nav">
+                <li><img src="./img/01.jpg" alt="" /></li>
+                <li><img src="./img/02.jpg" alt="" ></li>
+                <li><img src="./img/03.jpg" alt=""  /></li>
+                <li><img src="./img/04.jpg" alt=""  /></li>
+                <li><img src="./img/05.jpg" alt=""  /></li>
+            </ul>
+        </div>
+
+        <!-- 放大后的容器 -->
+        <div class="right_img">
+            <img class="imgs" src="./img/01.jpg" alt=""  />
+        </div>
+
+    </div>
+    <script>
+        /**
+         * 放大镜效果
+         *  1、先把tab切换实现完成
+         *  2、实现放大镜
+         *      思路:
+         *          1、offsetLeft offsetTop  offsetWidth offsetHeight clientX clientY
+         *          2、改变放大镜的left  top的值 ，然后放大镜就跟着鼠标走
+         *          3、改变右侧容器内图片的left top值
+         *          4、右侧图片需取反
+        // var width = x/(this.offsetWidth -scaleEle.offsetWidth);
+        // var height = y/(this.offsetHeight -scaleEle.offsetHeight);
+        // var bl = (imgs.offsetWidth - right_img.offsetWidth)*width;
+        // var bt = (imgs.offsetHeight - right_img.offsetHeight)*height;
+
+         *  计算比例：
+         *      
+        */
+        var content = document.getElementsByClassName('content')[0];
+        var left_img = document.getElementsByClassName('left_img');
+        var imgs = document.getElementsByClassName('imgs')[0];
+        var navChild = document.getElementsByClassName('nav')[0].children;
+        var arr = [
+            src="./img/01.jpg",
+            src="./img/02.jpg",            
+            src="./img/03.jpg",
+            src="./img/04.jpg",
+            src="./img/05.jpg",
+        ];
+        for(var i=0;i<navChild.length;i++){
+            // 存的变量
+            navChild[i].index = i;
+            navChild[i].onmouseover = function(){
+                for(var j=0;j<navChild.length;j++){
+                    left_img[j].className = 'left_img';
+                }
+                left_img[this.index].className = 'left_img current';
+                imgs.src = arr[this.index];
+            }  
+        }
+
+    // 获取放大镜元素
+    var scaleEle = document.getElementsByClassName('scaleEle')[0];
+    var right_img = document.getElementsByClassName('right_img')[0];
+    // 鼠标进入事件
+    content.onmouseover = function(){
+        scaleEle.style.display = "block";
+        right_img.style.display = "block";
+    }
+    // 鼠标移出事件
+    content.onmouseout = function(){
+        scaleEle.style.display = "none";
+        right_img.style.display = "none";
+    }
+    // 鼠标移动事件
+    content.onmousemove = function(ev){
+        // 处理兼容性
+        var e = e || window.event;
+        // X Y坐标
+        var x = e.clientX - this.offsetLeft - scaleEle.offsetWidth/2;
+        var y = e.clientY - this.offsetTop - scaleEle.offsetHeight/2;
+
+        scaleEle.style.left = Math.max(Math.min(x,this.offsetWidth - scaleEle.offsetWidth),0) + 'px';
+        scaleEle.style.top = Math.max(Math.min(y,this.offsetHeight - scaleEle.offsetHeight),0) + 'px';
+        // // 比例计算
+
+        // 最大坐标 ：(this.offsetWidth -scaleEle.offsetWidth)
+        // x：动态的  0 - this.offsetWidth -scaleEle.offsetWidth 进行移动
+        // x/最大的 = 值
+
+        // var width = x/(this.offsetWidth -scaleEle.offsetWidth);
+        // var height = y/(this.offsetHeight -scaleEle.offsetHeight);
+
+        // bl = 比例 * 右侧最大距离
+        // 比例 0<=比例<=1 
+        
+        // imgs.offsetWidth - right_img.offsetWidth
+
+        // var bl = (imgs.offsetWidth - right_img.offsetWidth)*width;
+        // var bt = (imgs.offsetHeight - right_img.offsetHeight)*height;
+
+        // 左右 图片移动的坐标
+        imgs.style.left = -2*x + 'px';
+        imgs.style.top = -2*y + 'px';  
+
+    }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>放大镜</title>
+	<style>
+     *{
+            margin:0;
+            padding:0;
+        }
+        html,body{
+            width:100%;
+            height:100vh;
+        }
+
+        .wrapper{
+          
+            height:600px;
+            display: flex;
+            margin-left: 100px;
+            flex-flow: row nowrap;
+        }
+        .wrap{
+            width:500px;
+            height:400px;
+            display: flex;
+            flex-flow: column nowrap;
+            margin-top: 50px;
+        }
+        
+        .content{
+            width:500px;
+            height:400px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .nav{
+            width:500px;
+            height:80px;
+        }
+        .nav li{
+            list-style: none;
+            float: left;
+        }
+        .nav li img{
+            width:90px;
+            height:80px;
+            margin: 5px;
+        }
+        .left_img{
+            width:500px;
+            height:400px;
+            display: none;
+        }
+        .right_img{
+            margin-left: 10px;
+            width:500px;
+            height:400px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 50px;
+        }
+        .imgs{
+            width:200%;
+            height:200%;
+            position: absolute;
+        }
+        .left_img.current{
+            display: block;
+        }
+        .scaleEle{
+            display: none;
+            position: absolute;
+            width:200px;
+            height:180px;
+            background: red;
+            cursor: pointer;
+            opacity: .3;
+        }
+    </style>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="wrap">
+
+			<div class="content">
+            <img class="left_img current" src="./img/06.jpg" alt="" />
+                <img class="left_img" src="./img/07.jpg" alt="" />
+                <img class="left_img" src="./img/08.jpg" alt="" />
+                <img class="left_img" src="./img/09.jpg" alt="" />
+                <img class="left_img" src="./img/010.jpg" alt="" />
+                <!-- 放大镜 -->
+                <div class="scaleEle"></div>
+			</div>
+
+			 <ul class="nav">
+                <li><img src="./img/06.jpg" alt="" /></li>
+                <li><img src="./img/07.jpg" alt="" ></li>
+                <li><img src="./img/08.jpg" alt=""  /></li>
+                <li><img src="./img/09.jpg" alt=""  /></li>
+                <li><img src="./img/010.jpg" alt=""  /></li>
+            </ul>
+
+		</div>
+
+
+         <!-- 放大后的容器 -->
+        <div class="right_img">
+            <img class="imgs" src="./img/06.jpg" alt=""  />
+        </div>
+
+
+	</div>
+	<script>
+    var content =document.getElementsByClassName('content')[0];
+     var left_img =document.getElementsByClassName('left_img');
+      var imgs =document.getElementsByClassName('imgs')[0];
+       var nav=document.getElementsByClassName('nav')[0].children;
+
+        
+
+        var arr = [
+            src="./img/06.jpg",
+            src="./img/07.jpg",            
+            src="./img/08.jpg",
+            src="./img/09.jpg",
+            src="./img/010.jpg",
+        ];
+   
+         for(var i=0;i<nav.length;i++){
+             nav[i].index=i;
+             nav[i].onmouseover=function(){
+             	for(var j=0;j<nav.length;j++){
+             		left_img[j].className='left_img';
+             	}
+             	 left_img[this.index].className='left_img current';
+             imgs.src=arr[this.index];
+             }
+            
+         }
+
+        //获取放大镜元素；
+        var scaleEle=document.getElementsByClassName('scaleEle')[0];
+        var right_img=document.getElementsByClassName('right_img')[0];
+        //鼠标进入事件；
+       content.onmouseover=function(){
+        	scaleEle.style.display='block';
+        	right_img.style.display='block';
+        }
+
+        // 鼠标移出事件
+    content.onmouseout = function(){
+        scaleEle.style.display = "none";
+        right_img.style.display = "none";
+    }
+
+   
+   
+
+        //鼠标移动事件；
+        content.onmousemove=function(ev){
+        	//处理兼容性
+        	var e=e|| window.event;
+
+        	// x y 坐标；
+        	var x=e.clientX-this.offsetLeft-scaleEle.offsetWidth/2;
+        	var y=e.clientY-this.offsetTop-scaleEle.offsetHeight/2;
+      
+      
+         scaleEle.style.left=Math.max(Math.min(x,this.offsetWidth-scaleEle.offsetWidth),0)+'px';
+         scaleEle.style.top=Math.max(Math.min(y,this.offsetHeight-scaleEle.offsetHeight),0)+'px';
+
+        // 左右 图片移动的坐标
+        imgs.style.left = -2*x + 'px';
+        imgs.style.top = -2*y + 'px';
+        }
+
+	</script>
+</body>
+</html>
